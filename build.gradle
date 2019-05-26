@@ -1,0 +1,64 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.5.RELEASE'
+	id 'org.flywaydb.flyway' version '5.2.4'
+	id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+flyway {
+	url = 'jdbc:postgresql://localhost:5432/postdb?currentSchema=upscale'
+	user = 'dbuser'
+	password = 'dbuser'
+}
+
+group = 'io.github.jetqin'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+	jcenter()
+}
+
+ext {
+	set('springCloudVersion', "Greenwich.SR1")
+	set('swaggerVersion','2.9.2')
+	set('lombokVersion', '1.18.8')
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	compile("org.springframework.boot:spring-boot-starter-data-jpa"){
+		exclude group: "org.hibernate", module: "hibernate-entitymanager"
+	}
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.cloud:spring-cloud-starter-oauth2'
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	compile ("org.eclipse.persistence:eclipselink:2.7.4" ){
+		exclude group:"org.eclipse.persistence", module:"javax.persistence"
+	}
+	compile "org.eclipse.persistence:org.eclipse.persistence.jpa:2.7.4"
+	compile "org.eclipse.persistence:javax.persistence:2.1.1"
+    compile "org.flywaydb:flyway-core:5.2.4"
+	compile "org.postgresql:postgresql"
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+	compile "io.springfox:springfox-swagger2:${swaggerVersion}"
+	compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
+
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	testCompile "com.github.tomakehurst:wiremock-jre8:2.23.2"
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}

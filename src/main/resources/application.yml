@@ -1,0 +1,25 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: upscale
+  datasource:
+    username: dbuser
+    password: dbuser
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postdb?currentSchema=upscale
+    hikari:
+      maximum-pool-size: 100
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+  flyway:
+    locations: classpath:db/migration
+  jpa:
+    generate-ddl: true
+    show-sql: true
+
+security:
+  basic:
+    enabled: false
