@@ -1,4 +1,4 @@
-# upscale
+# Upscale
 Demo project for upscale
 
 ## Backend Technical Stack
@@ -7,3 +7,4 @@ Demo project for upscale
 + Swagger to generate the api document
 + Eclipselink to implement the jpa
 + Gradle to compile the project CI
++ WireMock to implement the integration test
