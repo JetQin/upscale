@@ -1,6 +1,7 @@
 package io.github.jetqin.upscale.config;
 
 import com.google.common.base.Predicate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -19,10 +20,13 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableSwagger2
 public class SwaggerConfig extends WebMvcConfigurationSupport  {
 
+    @Value("${spring.application.name}")
+    String groupName;
+
     @Bean
     public Docket postsApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("public-api")
+                .groupName(groupName)
                 .apiInfo(apiInfo())
                 .select()
                 .paths(postPaths())

@@ -16,4 +16,8 @@ public class PersonService {
     public List<Person> listPerson(){
         return repository.findAll();
     }
+
+    public Person getPersonByName(String name){
+        return repository.findByName(name);
+    }
 }
