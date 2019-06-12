@@ -16,9 +16,14 @@ group = 'io.github.jetqin'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
+
 repositories {
 	mavenCentral()
 	jcenter()
+//	maven { url 'https://plugins.gradle.org/m2/' }
+//	maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+//	maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+//	maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
 }
 
 ext {
@@ -31,12 +36,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	compile("org.springframework.boot:spring-boot-starter-data-jpa"){
 		exclude group: "org.hibernate", module: "hibernate-entitymanager"
+		exclude group: "org.hibernate", module: "hibernate-core"
 	}
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation('org.springframework.boot:spring-boot-starter-web'){
+		exclude group: "org.hibernate.validator", module: "hibernate-validator"
+	}
+	implementation 'org.springframework.retry:spring-retry'
 	implementation 'org.springframework.cloud:spring-cloud-starter-oauth2'
-	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-	implementation 'org.springframework.kafka:spring-kafka'
+//	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+//	implementation 'org.springframework.kafka:spring-kafka'
 
 	compile ("org.eclipse.persistence:eclipselink:2.7.4" ){
 		exclude group:"org.eclipse.persistence", module:"javax.persistence"
@@ -55,7 +64,7 @@ dependencies {
 
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.kafka:spring-kafka-test'
+//	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testCompile "com.github.tomakehurst:wiremock-jre8:2.23.2"
 }
 

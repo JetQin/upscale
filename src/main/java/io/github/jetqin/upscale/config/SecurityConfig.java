@@ -14,9 +14,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // @formatter:off
     protected void configure(HttpSecurity http) throws Exception {
         log.info("{} using Custome configure(HttpSecurity).","Upscale");
-        http.httpBasic().disable();
+        http.csrf().disable()
+                .httpBasic().disable()
+                .authorizeRequests()
+                .antMatchers("/").permitAll();
     }
     // @formatter:on
+
 
     @Bean
     public RestTemplate restTemplate(){

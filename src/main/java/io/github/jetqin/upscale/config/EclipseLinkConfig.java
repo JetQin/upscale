@@ -1,5 +1,7 @@
 package io.github.jetqin.upscale.config;
 
+import org.eclipse.persistence.config.BatchWriting;
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
@@ -7,6 +9,7 @@ import org.springframework.boot.autoconfigure.transaction.TransactionManagerCust
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
@@ -22,7 +25,7 @@ import java.util.Map;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories("io.github.jetqin.upscale.service")
+@EnableJpaRepositories(value = "io.github.jetqin.upscale.service", bootstrapMode = BootstrapMode.LAZY)
 public class EclipseLinkConfig extends JpaBaseConfiguration {
 
 
@@ -49,11 +52,13 @@ public class EclipseLinkConfig extends JpaBaseConfiguration {
     @Override
     protected Map<String, Object> getVendorProperties() {
         final Map<String, Object> ret = new HashMap<>();
-//        ret.put(PersistenceUnitProperties.BATCH_WRITING, BatchWriting.JDBC);
+//        ret.put(PersistenceUnitProperties.BATCH_WRITING_SIZE, BatchWriting.JDBC);
+        ret.put(PersistenceUnitProperties.WEAVING,"false");
+        ret.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, "TENANT_JET_001");
 //        return ret;
 
         // Turn off dynamic weaving to disable LTW lookup in static weaving mode
-        return Collections.singletonMap("eclipselink.weaving", "false");
+        return ret;
     }
 
     private final Map<String, ?> initJpaProperties() {
