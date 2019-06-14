@@ -4,8 +4,12 @@ import io.github.jetqin.upscale.domain.Address;
 import io.github.jetqin.upscale.domain.Person;
 import io.github.jetqin.upscale.repository.AddressRepository;
 import io.github.jetqin.upscale.repository.PersonRepository;
+import io.github.jetqin.upscale.service.events.EventPublisherService;
+import io.github.jetqin.upscale.service.events.PersonCreateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
@@ -20,6 +24,9 @@ public class PersonService {
 
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    EventPublisherService eventPublisherService;
 
     public List<Person> listPerson(){
         return repository.findAll();
@@ -48,8 +55,10 @@ public class PersonService {
     }
 
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Person savePerson(Person person){
         Assert.notNull(person,"Person should not be null");
+        eventPublisherService.publishMessage(new PersonCreateEvent(person,"persist person"));
         return repository.save(person);
     }
 
