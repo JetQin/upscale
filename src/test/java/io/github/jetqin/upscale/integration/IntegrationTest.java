@@ -34,12 +34,12 @@ public class IntegrationTest {
 
     @Test
     public void testListPerson(){
-        stubFor(get(urlEqualTo("/person/list"))
-                .withHeader("Accept", equalTo("application/json"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBodyFile("json/person.json")));
+//        stubFor(get(urlEqualTo("/person/list"))
+//                .withHeader("Accept", equalTo("application/json"))
+//                .willReturn(aResponse()
+//                        .withStatus(200)
+//                        .withHeader("Content-Type", "application/json")
+//                        .withBodyFile("json/person.json")));
 
 
         HttpHeaders headers = new HttpHeaders();
@@ -61,7 +61,8 @@ public class IntegrationTest {
                 "  }\n" +
                 "]"));
         verify(getRequestedFor(urlMatching("/person/list"))
-                .withHeader("Content-Type", matching("application/json")));
+                .withHeader("Content-Type", matching("application/json"))
+                );
     }
 
 }

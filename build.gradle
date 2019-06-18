@@ -1,10 +1,12 @@
 plugins {
 	id 'org.springframework.boot' version '2.1.5.RELEASE'
 	id 'org.flywaydb.flyway' version '5.2.4'
+	id "org.unbroken-dome.test-sets" version "2.1.1"
 	id 'java'
 }
 
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.unbroken-dome.test-sets'
 
 flyway {
 	url = 'jdbc:postgresql://localhost:5432/postdb?currentSchema=upscale'
@@ -20,11 +22,30 @@ sourceCompatibility = '1.8'
 repositories {
 	mavenCentral()
 	jcenter()
-//	maven { url 'https://plugins.gradle.org/m2/' }
+	maven { url 'https://plugins.gradle.org/m2/' }
 //	maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
 //	maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
 //	maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
 }
+
+testSets {
+	integrationTest { dirName = 'groovy' }
+}
+
+
+sourceSets {
+	integrationTest {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/groovy/java')
+		}
+		resources.srcDir file('src/groovy/resources')
+	}
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
 
 ext {
 	set('springCloudVersion', "Greenwich.SR1")
@@ -33,6 +54,8 @@ ext {
 }
 
 dependencies {
+//	classpath "org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:2.1.1"
+
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	compile("org.springframework.boot:spring-boot-starter-data-jpa"){
 		exclude group: "org.hibernate", module: "hibernate-entitymanager"
@@ -64,7 +87,9 @@ dependencies {
 
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	testCompile "org.codehaus.groovy:groovy-all:2.4.11"
+	testCompile "org.spockframework:spock-core:1.2-groovy-2.4"
 	testCompile "com.github.tomakehurst:wiremock-jre8:2.23.2"
 }
 
@@ -73,3 +98,13 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
+
+//
+//integrationTest {
+//	useJUnit {
+//		includeCategories 'integrationTest'
+//	}
+//	testLogging {
+//		showStandardStreams = true
+//	}
+//}

@@ -1,0 +1,22 @@
+import io.github.jetqin.upscale.domain.Person
+import org.junit.experimental.categories.Category
+import org.springframework.boot.test.context.SpringBootTest
+import spock.lang.Specification
+
+//@Category(IntegrationTest.class)
+@SpringBootTest
+class PersonListSpec extends Specification{
+
+    def 'update person name'() {
+
+        given:
+        def person = new Person(1L, "Jet", Collections.emptyList())
+
+        when:
+        person.setName("Bruce")
+
+        then:
+        person.getName() == "Bruce"
+
+    }
+}
