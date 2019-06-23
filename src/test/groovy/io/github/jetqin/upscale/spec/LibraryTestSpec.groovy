@@ -2,7 +2,7 @@ package io.github.jetqin.upscale.spec
 
 import spock.lang.Specification
 
-class LibraryTest extends Specification {
+class LibraryTestSpec extends Specification {
 
     def "test sum method"() {
         given:
