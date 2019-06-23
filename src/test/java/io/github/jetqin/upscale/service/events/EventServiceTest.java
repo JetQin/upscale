@@ -16,7 +16,7 @@ public class EventServiceTest {
     @Mock
     ApplicationEventPublisher publisher;
 
-    @Mock
+    @InjectMocks
     EventListenerService eventListenerService;
 
     @InjectMocks
@@ -33,7 +33,6 @@ public class EventServiceTest {
     public void testEventPublishService(){
         PersonCreateEvent event = new PersonCreateEvent("","Person Created");
         eventPublisherService.publishMessage(event);
-        verify(eventListenerService, timeout(1000)).handlePersonCreate(any(PersonCreateEvent.class));
         verify(publisher, times(1)).publishEvent(any(PersonCreateEvent.class));
 
     }

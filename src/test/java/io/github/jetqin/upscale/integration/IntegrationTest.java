@@ -1,29 +1,22 @@
 package io.github.jetqin.upscale.integration;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.MappingBuilder;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import io.github.jetqin.upscale.domain.Person;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.*;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.assertTrue;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+import static org.junit.Assert.assertTrue;
 
 
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class IntegrationTest {
 
 //    @Rule
@@ -32,11 +25,8 @@ public class IntegrationTest {
 //            .httpsPort(8443));
 
     WireMockServer wm = new WireMockServer(options()
-//            .mappingSource(MappingBuilder.class.getResource("classpath://mappings").)
+            .bindAddress("localhost")
             .port(8089));
-
-
-//    WireMock wireMock = new WireMock("localhost", 8089);
 
     RestTemplate restTemplate;
 
@@ -46,9 +36,6 @@ public class IntegrationTest {
     public void setup(){
         restTemplate = new RestTemplate();
         response = null;
-//        wireMock.
-//        wm.addStubMapping(StubMapping.buildFrom(Class));
-//        wm.stubFor(MappingBuilder.class.)
         wm.start();
     }
 
@@ -69,7 +56,8 @@ public class IntegrationTest {
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         Person person = new Person(1L,"Bruce",Collections.emptyList());
 
-        ResponseEntity<String> response = restTemplate.exchange("http://localhost:8089/person/list", HttpMethod.GET, entity, String.class, person);
+
+        ResponseEntity<String> response = restTemplate.exchange(this.buildApiMethodUrl(), HttpMethod.GET, entity, String.class, person);
         assertTrue(response.getStatusCode().equals(HttpStatus.OK));
         assertTrue(response.getBody().equals("[\n" +
                 "  {\n" +
@@ -81,10 +69,18 @@ public class IntegrationTest {
                 "    \"name\": \"Alex\"\n" +
                 "  }\n" +
                 "]"));
-        verify(getRequestedFor(urlMatching("/person/list"))
-                .withHeader("Content-Type", matching("application/json"))
-//                .withRequestBody(matchingJsonPath("$.name == 'Bruce'"))
-                );
+
+        wm.verify(getRequestedFor(urlEqualTo("/person/list"))
+                .withHeader("Content-Type", matching(MediaType.APPLICATION_JSON_VALUE))
+//                .withRequestBody(matchingJsonPath("$.name", equalTo("Bruce")))
+        );
+
+    }
+
+    private String buildApiMethodUrl() {
+        return String.format("http://localhost:%d/person/list",
+                this.wm.port()
+        );
     }
 
 }

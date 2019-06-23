@@ -1,12 +1,19 @@
 plugins {
 	id 'org.springframework.boot' version '2.1.5.RELEASE'
 	id 'org.flywaydb.flyway' version '5.2.4'
-	id "org.unbroken-dome.test-sets" version "2.1.1"
 	id 'java'
 }
 
+ext {
+	set('springCloudVersion', "Greenwich.SR1")
+	set('swaggerVersion','2.9.2')
+	set('lombokVersion', '1.18.8')
+}
+
+
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.unbroken-dome.test-sets'
+apply plugin: 'groovy'
+
 
 flyway {
 	url = 'jdbc:postgresql://localhost:5432/postdb?currentSchema=upscale'
@@ -15,7 +22,7 @@ flyway {
 }
 
 group = 'io.github.jetqin'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 sourceCompatibility = '1.8'
 
 
@@ -28,33 +35,47 @@ repositories {
 //	maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
 }
 
-testSets {
-	integrationTest { dirName = 'groovy' }
-}
-
+def wrappers = file("${buildDir}/wrappers")
+def outputDir = new File(buildDir, "classes/main")
 
 sourceSets {
-	integrationTest {
-		java {
-			compileClasspath += main.output + test.output
-			runtimeClasspath += main.output + test.output
-			srcDir file('src/groovy/java')
+	test {
+		groovy {
+			println "java.srcDirs = ${java.srcDirs}"
+			println "resources.srcDirs = ${resources.srcDirs}"
+			println "java.files = ${java.files.name}"
+			println "allJava.files = ${allJava.files.name}"
+			println "resources.files = ${resources.files.name}"
+			println "allSource.files = ${allSource.files.name}"
+			println "output.classesDir = ${output.classesDirs}"
+			println "output.resourcesDir = ${output.resourcesDir}"
+			println "output.files = ${output.files}"
+			println "buildDir = $buildDir/classes"
+			println "output = $outputDir"
+
+			srcDir file('src/test/groovy')
+			output.dir(wrappers, builtBy: 'compileTestGroovy')
 		}
-		resources.srcDir file('src/groovy/resources')
 	}
 }
 
-check.dependsOn integrationTest
-integrationTest.mustRunAfter test
+//task itTest(type: Test) {
+//	group 'Verification'
+//	description 'Runs the integration tests.'
+//	testClassesDirs = sourceSets.test.output.classesDirs
+//	classpath = sourceSets.test.runtimeClasspath
+//	binResultsDir = file("$buildDir/it-test-results/binary/it")
+//}
 
-ext {
-	set('springCloudVersion', "Greenwich.SR1")
-	set('swaggerVersion','2.9.2')
-	set('lombokVersion', '1.18.8')
+task display {
+	doLast {
+		println "outputDir: $buildDir"
+		println "sourceSets.test.groovy.outputDir: ${sourceSets.test.groovy.outputDir}"
+		println "compileGroovy.destinationDir:     ${compileGroovy.destinationDir}"
+	}
 }
 
 dependencies {
-//	classpath "org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:2.1.1"
 
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	compile("org.springframework.boot:spring-boot-starter-data-jpa"){
@@ -67,8 +88,8 @@ dependencies {
 	}
 	implementation 'org.springframework.retry:spring-retry'
 	implementation 'org.springframework.cloud:spring-cloud-starter-oauth2'
-//	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-//	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	implementation 'org.springframework.kafka:spring-kafka'
 
 	compile ("org.eclipse.persistence:eclipselink:2.7.4" ){
 		exclude group:"org.eclipse.persistence", module:"javax.persistence"
@@ -77,6 +98,7 @@ dependencies {
 	compile "org.eclipse.persistence:javax.persistence:2.1.1"
     compile "org.flywaydb:flyway-core:5.2.4"
 	compile "org.postgresql:postgresql"
+
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
@@ -88,8 +110,8 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
-	testCompile "org.codehaus.groovy:groovy-all:2.4.11"
-	testCompile "org.spockframework:spock-core:1.2-groovy-2.4"
+	testCompile "org.codehaus.groovy:groovy-all:2.5.7"
+	testCompile "org.spockframework:spock-core:1.3-groovy-2.5"
 	testCompile "com.github.tomakehurst:wiremock-jre8:2.23.2"
 }
 
@@ -98,13 +120,3 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
-
-//
-//integrationTest {
-//	useJUnit {
-//		includeCategories 'integrationTest'
-//	}
-//	testLogging {
-//		showStandardStreams = true
-//	}
-//}

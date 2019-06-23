@@ -1,12 +1,12 @@
+package io.github.jetqin.upscale.spec
+
 import io.github.jetqin.upscale.domain.Person
-import org.junit.experimental.categories.Category
-import org.springframework.boot.test.context.SpringBootTest
+import org.junit.Test
 import spock.lang.Specification
 
-//@Category(IntegrationTest.class)
-@SpringBootTest
 class PersonListSpec extends Specification{
 
+    @Test
     def 'update person name'() {
 
         given:
