@@ -36,51 +36,48 @@ repositories {
 }
 
 sourceSets {
-	test {
-		groovy {
-			println "java.srcDirs = ${java.srcDirs}"
-			println "resources.srcDirs = ${resources.srcDirs}"
-			println "java.files = ${java.files.name}"
-			println "allJava.files = ${allJava.files.name}"
-			println "resources.files = ${resources.files.name}"
-			println "allSource.files = ${allSource.files.name}"
-			println "output.classesDir = ${output.classesDirs}"
-			println "output.resourcesDir = ${output.resourcesDir}"
-			println "output.files = ${output.files}"
-			println "buildDir = $buildDir/classes"
-
-			srcDir file('src/test/groovy')
-		}
-	}
-
 	integrationTest {
-		java {
-			compileClasspath += main.output + test.output
-			runtimeClasspath += main.output + test.output
-			srcDir file('src/test/groovy')
-		}
-//		resources.srcDir file('src/integration-test/resources')
-	}
-}
+//		println "java.srcDirs = ${java.srcDirs}"
+//		println "resources.srcDirs = ${resources.srcDirs}"
+//		println "java.files = ${java.files.name}"
+//		println "allJava.files = ${allJava.files.name}"
+//		println "resources.files = ${resources.files.name}"
+//		println "allSource.files = ${allSource.files.name}"
+		println "output.classesDir = ${output.classesDirs}"
+		println "output.resourcesDir = ${output.resourcesDir}"
+//		println "output.files = ${output.files}"
+//		println "buildDir = $buildDir/classes"
 
-configurations {
-	integrationTestCompile.extendsFrom testCompile
-	integrationTestRuntime.extendsFrom testRuntime
+		java.srcDir file('src/test/groovy')
+		resources.srcDir file('src/test/resources')
+//		compileClasspath = sourceSets.main.output + configurations.testRuntime
+//		runtimeClasspath = output + compileClasspath
+
+		println "compileClasspath = $sourceSets.main.output"
+		println "runtimeClasspath = $runtimeClasspath"
+	}
 }
 
 test {
-	useJUnit()
-//	filter {
-//	}
+	exclude '**/*Spec.class'
+	reports.html.destination = file ("$reports.html.destination/unit")
+	reports.junitXml.destination = file("$reports.junitXml.destination/unit")
+}
+
+task unitTest(type: Test) {
+	exclude '**/*Spec.class'
 }
 
 task integrationTest(type: Test) {
 	description = 'Runs integration tests.'
 	group = 'verification'
 
+	include '**/*Spec.class'
+	reports.html.destination = file ("$reports.html.destination/itTest")
+	reports.junitXml.destination = file("$reports.junitXml.destination/itTest")
+
 	testClassesDirs = sourceSets.integrationTest.output.classesDirs
 	classpath = sourceSets.integrationTest.runtimeClasspath
-	shouldRunAfter test
 }
 
 check.dependsOn integrationTest
